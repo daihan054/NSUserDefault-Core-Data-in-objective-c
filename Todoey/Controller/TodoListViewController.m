@@ -43,6 +43,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     Item *item = self.itemArray[indexPath.row];
     item.done = !item.done;
+    [self saveArrayToUserDefault];
     [tableView reloadData];
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
@@ -61,7 +62,6 @@
         [self.itemArray addObject:item];
         
         [self saveArrayToUserDefault];
-
         [self.tableView reloadData];
     }];
     
