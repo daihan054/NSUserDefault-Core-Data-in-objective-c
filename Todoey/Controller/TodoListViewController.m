@@ -20,8 +20,10 @@
     [super viewDidLoad];
     self.delegate = (AppDelegate*) UIApplication.sharedApplication.delegate;
     self.context = self.delegate.persistentContainer.viewContext;
-    self.itemArray = [[NSMutableArray alloc] init]; // Initialize itemArray
-    [self loadItems];
+    self.itemArray = [[NSMutableArray alloc] init];
+    
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Item"];
+    [self loadItemsWith:request withPredicate:nil];
 }
 
 #pragma mark - Tableview Datasource Methods
@@ -50,6 +52,24 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
+#pragma mark- UISearchBarDelegate
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Item"];
+    request.sortDescriptors = @[[[NSSortDescriptor alloc]initWithKey:@"title" ascending:YES]];
+    [self loadItemsWith:request withPredicate:[NSPredicate predicateWithFormat:@"title CONTAINS[cd] %@", searchBar.text]];
+}
+
+- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
+    if ([searchText isEqualToString:@""]) {
+        NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Item"];
+        
+        [self loadItemsWith: request withPredicate:nil];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [searchBar resignFirstResponder];
+        });
+    }
+}
+
 #pragma mark - Add New Items
 
 - (IBAction)addButtonPressed:(UIBarButtonItem *)sender {
@@ -61,6 +81,7 @@
         Item* newItem = [[Item alloc]initWithContext:self.context];
         newItem.title = myTextField.text;
         newItem.done = NO;
+        newItem.parentCategory = self.selectedCategory;
         [self.itemArray addObject:newItem];
         
         [self saveItems];
@@ -78,9 +99,17 @@
 
 #pragma mark - Core data methods
 
-- (void)loadItems {
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Item"];
+- (void)loadItemsWith:(NSFetchRequest*) request withPredicate:(NSPredicate*)predicate {
     NSError *error = nil;
+    NSPredicate* categoryPredicate = [NSPredicate predicateWithFormat:@"parentCategory.name MATCHES %@", self.selectedCategory.name];
+    
+    if (predicate) {
+        NSCompoundPredicate* compoundPredicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[categoryPredicate,predicate]];
+        request.predicate = compoundPredicate;
+    } else {
+        request.predicate = categoryPredicate;
+    }
+    
     NSArray *results = [self.context executeFetchRequest:request error:&error];
     
     if (error) {
@@ -101,7 +130,6 @@
 
 - (void)deleteItemAt:(NSIndexPath * _Nonnull)indexPath {
     Item *item = self.itemArray[indexPath.row];
-    //    item.done = !item.done;
     [self.context deleteObject:item];
     [self.itemArray removeObjectAtIndex:indexPath.row];
 }

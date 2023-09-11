@@ -8,9 +8,10 @@
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
 #import "Item+CoreDataClass.h"
+#import "Category+CoreDataClass.h"
 
-@interface TodoListViewController : UITableViewController
+@interface TodoListViewController : UITableViewController <UISearchBarDelegate>
 
-
+@property(nonatomic,strong) Category* selectedCategory;
 @end
 

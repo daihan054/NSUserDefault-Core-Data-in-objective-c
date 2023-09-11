@@ -15,6 +15,7 @@
 		C7147C812AA9A2560028A42D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7147C7F2AA9A2560028A42D /* LaunchScreen.storyboard */; };
 		C7147C842AA9A2560028A42D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C7147C832AA9A2560028A42D /* main.m */; };
 		C7147C922AA9E3930028A42D /* DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C7147C902AA9E3930028A42D /* DataModel.xcdatamodeld */; };
+		C73B9F5A2AAECDCC009E1136 /* CategoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C73B9F592AAECDCC009E1136 /* CategoryViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,8 @@
 		C7147C822AA9A2560028A42D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C7147C832AA9A2560028A42D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C7147C912AA9E3930028A42D /* DataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DataModel.xcdatamodel; sourceTree = "<group>"; };
+		C73B9F582AAECDCC009E1136 /* CategoryViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CategoryViewController.h; sourceTree = "<group>"; };
+		C73B9F592AAECDCC009E1136 /* CategoryViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CategoryViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +93,8 @@
 			children = (
 				C7147C742AA9A2530028A42D /* TodoListViewController.h */,
 				C7147C752AA9A2530028A42D /* TodoListViewController.m */,
+				C73B9F582AAECDCC009E1136 /* CategoryViewController.h */,
+				C73B9F592AAECDCC009E1136 /* CategoryViewController.m */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -177,6 +182,7 @@
 				C7147C762AA9A2530028A42D /* TodoListViewController.m in Sources */,
 				C7147C922AA9E3930028A42D /* DataModel.xcdatamodeld in Sources */,
 				C7147C702AA9A2530028A42D /* AppDelegate.m in Sources */,
+				C73B9F5A2AAECDCC009E1136 /* CategoryViewController.m in Sources */,
 				C7147C732AA9A2530028A42D /* SceneDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
