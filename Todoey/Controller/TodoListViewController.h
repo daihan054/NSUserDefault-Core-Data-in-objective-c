@@ -6,7 +6,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Item.h"
+#import "AppDelegate.h"
+#import "Item+CoreDataClass.h"
 
 @interface TodoListViewController : UITableViewController
 

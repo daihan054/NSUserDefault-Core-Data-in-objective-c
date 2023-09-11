@@ -8,18 +8,20 @@
 #import "TodoListViewController.h"
 
 @interface TodoListViewController ()
-
 @property (strong, nonatomic) NSMutableArray<Item *> *itemArray;
 @property (nonatomic, strong) NSUserDefaults *userDefaults;
-
+@property (nonatomic,strong) NSManagedObjectContext* context;
+@property (nonatomic,strong) AppDelegate* delegate;
 @end
 
 @implementation TodoListViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    [self retrieveArrayFromUserDefault];
+    self.delegate = (AppDelegate*) UIApplication.sharedApplication.delegate;
+    self.context = self.delegate.persistentContainer.viewContext;
+    self.itemArray = [[NSMutableArray alloc] init]; // Initialize itemArray
+    [self loadItems];
 }
 
 #pragma mark - Tableview Datasource Methods
@@ -43,8 +45,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     Item *item = self.itemArray[indexPath.row];
     item.done = !item.done;
-    [self saveArrayToUserDefault];
-    [tableView reloadData];
+    
+    [self saveItems];
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
@@ -56,13 +58,12 @@
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Add New Todoey Item" message:@"" preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction *action = [UIAlertAction actionWithTitle:@"Add Item" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        NSLog(@"%@, \n myTextField.text = %@",self.itemArray,myTextField.text);
+        Item* newItem = [[Item alloc]initWithContext:self.context];
+        newItem.title = myTextField.text;
+        newItem.done = NO;
+        [self.itemArray addObject:newItem];
         
-        Item* item = [[Item alloc]initWithTitle:myTextField.text done:NO];
-        [self.itemArray addObject:item];
-        
-        [self saveArrayToUserDefault];
-        [self.tableView reloadData];
+        [self saveItems];
     }];
     
     [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
@@ -75,23 +76,42 @@
     [self presentViewController:alert animated:YES completion:nil];
 }
 
-#pragma mark - UserDefault methods
-- (NSUserDefaults *)userDefaults {
-    if (!_userDefaults) {
-        _userDefaults = NSUserDefaults.standardUserDefaults;
+#pragma mark - Core data methods
+
+- (void)loadItems {
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Item"];
+    NSError *error = nil;
+    NSArray *results = [self.context executeFetchRequest:request error:&error];
+    
+    if (error) {
+        NSLog(@"Failed to retrieve data: %@", error);
+    } else {
+        self.itemArray = [NSMutableArray arrayWithArray:results];
     }
-    return _userDefaults;
+    [self.tableView reloadData];
 }
 
-- (void)retrieveArrayFromUserDefault {
-    NSData * encodedData = [self.userDefaults objectForKey:@"ToDoListArray"];
-    self.itemArray = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:[NSMutableArray class], [Item class], nil] fromData:encodedData error:nil];
+- (void)saveItems {
+    NSError *error;
+    if (![self.context save:&error]) {
+        NSLog(@"Error saving context %@, %@", error, [error localizedDescription]);
+    }
+    [self.tableView reloadData];
 }
 
-- (void)saveArrayToUserDefault {
-    NSData *encodedData = [NSKeyedArchiver archivedDataWithRootObject:self.itemArray requiringSecureCoding:YES error:nil];
-    [self.userDefaults setObject:encodedData forKey:@"ToDoListArray"];
-    [self.userDefaults synchronize];
+- (void)deleteItemAt:(NSIndexPath * _Nonnull)indexPath {
+    Item *item = self.itemArray[indexPath.row];
+    //    item.done = !item.done;
+    [self.context deleteObject:item];
+    [self.itemArray removeObjectAtIndex:indexPath.row];
 }
 
 @end
+
+/*
+ CRUD:
+ C: create -> line 61 to 66
+ R: read -> loadItems method
+ U: update -> didSelectRowAtIndexPath method, changing done property
+ D: delete -> deleteItemAt method, it can be called from didSelectRowAtIndexPath method
+ */
